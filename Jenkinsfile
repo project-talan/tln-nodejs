@@ -1,6 +1,7 @@
 node {
    stage('checkout') {
     sh 'pwd';
+    sh 'ls -la';
     sh 'git status';
     sh 'git log -3';
    }
