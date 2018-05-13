@@ -6,6 +6,7 @@ node {
   def org = '';
   //
   stage('checkout') {
+    //
     def scmVars = checkout scm;
     if (params.containsKey('sha1')) {
       pullRequest = true;
@@ -24,10 +25,6 @@ node {
     //
     echo sh(returnStdout: true, script: 'env');
     //
-    sh 'pwd';
-    sh 'ls -la';
-    sh 'git status';
-    sh 'git log -3';
   }
   stage('build') {
     sh './build.sh';
