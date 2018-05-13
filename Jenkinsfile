@@ -17,7 +17,11 @@ node {
       branchToBuild = scmVars.GIT_BRANCH;
     }
     echo "Build info: PR:${pullRequest}, BRANCH: ${branchToBuild}, COMMIT: ${commitToBuild}";
-    sh "git checkout ${commitToBuild}";
+    //sh "git checkout ${commitToBuild}";
+    //
+    sh 'envsubst < .env.template > .env
+    sh 'cat ./.env'
+    //
     echo sh(returnStdout: true, script: 'env');
     //
     sh 'pwd';
@@ -26,8 +30,10 @@ node {
     sh 'git log -3';
   }
   stage('build') {
+    sh './build.sh';
   }
   stage('test') {
+    sh './test.sh';
   }
   stage('package') {
   }
