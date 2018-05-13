@@ -19,8 +19,8 @@ node {
     echo "Build info: PR:${pullRequest}, BRANCH: ${branchToBuild}, COMMIT: ${commitToBuild}";
     //sh "git checkout ${commitToBuild}";
     //
-    sh 'envsubst < .env.template > .env
-    sh 'cat ./.env'
+    sh 'envsubst < .env.template > .env';
+    sh 'cat ./.env';
     //
     echo sh(returnStdout: true, script: 'env');
     //
