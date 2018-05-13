@@ -25,5 +25,9 @@ appl.get('/healthcheck', (req, res) => {
   res.json(reply.build(0, 'up&running', v));
 });
 //
-var server = appl.listen(appl.params.get('port'), appl.params.get('lstn'));
+var server = appl.listen(appl.params.get('port'), appl.params.get('lstn'), () => {
+  const host = server.address().address;
+  const port = server.address().port;
+  console.log(`Server is listening http://${host}:${port}`);
+});
 module.exports = { server:server, params:appl.params };
