@@ -11,7 +11,7 @@
   "main": "src/appl.js",
   "scripts": {
     "start": "node src/appl.js",
-    "serve": "nodemon --watch src --watch spec",
+    "serve": "NODE_ENV=development nodemon --watch src --watch spec",
     "jasmine-init": "./node_modules/jasmine/bin/jasmine.js init",
     "jasmine": "./node_modules/jasmine/bin/jasmine.js",
     "karma-init": "karma init",
