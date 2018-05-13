@@ -11,30 +11,30 @@
   "main": "src/appl.js",
   "scripts": {
     "start": "node src/appl.js",
-    "dev": "nodemon NODE_ENV=development nodemon --watch src/**/*.js --inspect ./src/appl.js",
+    "serve": "NODE_ENV=development nodemon --watch src --watch spec",
     "jasmine-init": "./node_modules/jasmine/bin/jasmine.js init",
     "jasmine": "./node_modules/jasmine/bin/jasmine.js",
     "karma-init": "karma init",
     "karma": "karma start"
   },
   "dependencies": {
-    "cors": "^2.8.4",
-    "dotenv": "^5.0.1",
-    "express": "^4.16.3",
-    "express-session": "^1.15.6",
-    "request": "^2.85.0",
-    "session-file-store": "^1.2.0"
+    "cors": "2.8.4",
+    "dotenv": "5.0.1",
+    "express": "4.16.3",
+    "express-session": "1.15.6",
+    "request": "2.85.0",
+    "session-file-store": "1.2.0"
   },
   "devDependencies": {
-    "jasmine": "^3.1.0",
-    "jasmine-core": "^3.1.0",
-    "karma": "^2.0.2",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-coverage": "^1.1.2",
-    "karma-jasmine": "^1.1.2",
-    "karma-requirejs": "^1.1.0",
-    "nodemon": "^1.17.4",
-    "puppeteer": "^1.4.0",
-    "requirejs": "^2.3.5"
+    "jasmine": "3.1.0",
+    "jasmine-core": "3.1.0",
+    "karma": "2.0.2",
+    "karma-chrome-launcher": "2.2.0",
+    "karma-coverage": "1.1.2",
+    "karma-jasmine": "1.1.2",
+    "karma-requirejs": "1.1.0",
+    "nodemon": "1.17.3",
+    "puppeteer": "1.4.0",
+    "requirejs": "2.3.5"
   }
 }
