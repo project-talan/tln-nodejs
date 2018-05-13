@@ -17,7 +17,7 @@ node {
       branchToBuild = scmVars.GIT_BRANCH;
     }
     echo "Build info: PR:${pullRequest}, BRANCH: ${branchToBuild}, COMMIT: ${commitToBuild}";
-    //sh "git checkout ${commitToBuild}";
+    sh "git checkout ${commitToBuild}";
     echo sh(returnStdout: true, script: 'env');
     //
     sh 'pwd';
