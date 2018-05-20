@@ -19,7 +19,7 @@ module.exports = function(name, variables) {
   }
   //
   this.printParams = function() {
-    console.log(`@tlas ${name} service`);
+    console.log(`${name} service`);
     console.log(this.variables);
   }
   //
