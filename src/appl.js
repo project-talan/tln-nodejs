@@ -9,7 +9,10 @@ const prjEnvPrefix = `SERVICES_${prjNameCap}`;
 const express = require('express');
 require('dotenv').config();
 
-// Appl
+// project specific modules
+//
+
+// appl
 const appl = express();
 const reply = require('./utils/reply')();
 appl.params = require('./utils/params')(prjName, { 
