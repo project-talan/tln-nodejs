@@ -8,12 +8,17 @@ const prjEnvPrefix = `SERVICES_${prjNameCap}`;
 // common modules
 const express = require('express');
 require('dotenv').config();
+const bodyParser = require('body-parser');
 
 // project specific modules
 //
 
 // appl
+// global application middleware
 const appl = express();
+appl.use(bodyParser.json());
+
+// utilities
 const reply = require('./utils/reply')();
 appl.params = require('./utils/params')(prjName, { 
   host:   { env:`${prjEnvPrefix}_HOST`, def:'localhost' },
@@ -23,6 +28,7 @@ appl.params = require('./utils/params')(prjName, {
   version:{ env:`PROJECT_VERSION`, def:'0.1.0' }
 });
 
+// heakthcheck endpoint
 appl.get('/healthcheck', (req, res) => {
   var v = appl.params.getAllVariables();
   res.json(reply.build(0, 'up&running', v));
