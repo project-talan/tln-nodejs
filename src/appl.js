@@ -19,7 +19,26 @@ const appl = express();
 appl.use(bodyParser.json());
 
 // utilities
+// json validator
+const healthCheckSchema = {
+  "title": "Healthcheck options schema",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "timeout": {
+      "type": "number",
+      "description": "Status update timeout"
+    }
+  },
+  "required": ["timeout"]
+};
+const jsv = require('./utils/jsv')({ allErrors:true, removeAdditional:'all' });
+jsv.compile('healthCheckSchema', healthCheckSchema);
+
+// API response composer
 const reply = require('./utils/reply')();
+
+// service parameters
 appl.params = require('./utils/params')(prjName, { 
   host:   { env:`${prjEnvPrefix}_HOST`, def:'localhost' },
   lstn:   { env:`${prjEnvPrefix}_LSTN`, def:'0.0.0.0' },
@@ -29,10 +48,21 @@ appl.params = require('./utils/params')(prjName, {
 });
 
 // heakthcheck endpoint
-appl.get('/healthcheck', (req, res) => {
-  var v = appl.params.getAllVariables();
-  res.json(reply.build(0, 'up&running', v));
-});
+appl.route('/healthcheck')
+  .get( (req, res) => {
+    return res.json(reply.success(appl.params.getAllVariables()));
+  })
+  .post( 
+    (req, res, next) => {
+      if (!jsv.validate('healthCheckSchema', req.body)){
+        return res.json(reply.fail(jsv.errors('healthCheckSchema')));
+      }
+      next();
+    },
+    (req, res) => {
+      return res.json(reply.success({key:"value"}));
+    }
+  );
 //
 var server = appl.listen(appl.params.get('port'), appl.params.get('lstn'), () => {
   const host = server.address().address;
