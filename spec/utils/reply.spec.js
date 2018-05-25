@@ -1,8 +1,8 @@
 const reply = require('./../../src/utils/reply')();
 
 describe("Reply", () => {
-  const c = 200;
-  const m = 'message';
+  const e = ['error1', 'error2'];
+  const l = ['link1', 'link2'];
   const d = {var:'name'};
   //
   beforeAll(() => {
@@ -10,16 +10,13 @@ describe("Reply", () => {
   afterAll(() => {
   });
 
-  it("Build", () => {
-    expect({code:0, msg:'', data:[d]}).toEqual(reply.buildData([d]));
+  it("Success without links", () => {
+    expect({success:true, data:d, links:null}).toEqual(reply.success(d));
   });
-  it("Build code", () => {
-    expect({code:c, msg:'', data:null}).toEqual(reply.buildCode(c));
+  it("Success with links", () => {
+    expect({success:true, data:d, links:l}).toEqual(reply.success(d, l));
   });
-  it("Build code/message", () => {
-    expect({code:c, msg:m, data:null}).toEqual(reply.buildCodeMsg(c, m));
-  });
-  it("Build data", () => {
-    expect({code:0, msg:'', data:d}).toEqual(reply.buildData(d));
+  it("Fail", () => {
+    expect({success:false, errors:e}).toEqual(reply.fail(e));
   });
 });
