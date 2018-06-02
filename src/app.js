@@ -12,11 +12,24 @@ const bodyParser = require('body-parser');
 
 // project specific modules
 //
+const jsv = require('./utils/jsv')({ allErrors:true, removeAdditional:'all' });
+// API response composer
+const reply = require('./utils/reply')();
+// helpers
+const helpers = require('./utils/helpers')(jsv, reply);
 
-// appl
+// app
 // global application middleware
-const appl = express();
-appl.use(bodyParser.json());
+const app = express();
+app.use(bodyParser.json());
+app.use(function (err, req, res, next) {
+  if (err instanceof SyntaxError) {
+    return res.status(400).json(reply.fail(`Input json Syntax error: '${err.message}'`));
+  } else {
+    next(err);
+  }
+});
+
 
 // utilities
 // json validator
@@ -32,16 +45,10 @@ const healthCheckSchema = {
   },
   "required": ["timeout"]
 };
-const jsv = require('./utils/jsv')({ allErrors:true, removeAdditional:'all' });
 jsv.compile('healthCheckSchema', healthCheckSchema);
 
-// API response composer
-const reply = require('./utils/reply')();
-// helpers
-const helpers = require('./utils/helpers')(jsv, reply);
-
 // service parameters
-appl.params = require('./utils/params')(prjName, { 
+app.params = require('./utils/params')(prjName, { 
   host:   { env:`${prjEnvPrefix}_HOST`, def:'localhost' },
   lstn:   { env:`${prjEnvPrefix}_LSTN`, def:'0.0.0.0' },
   port:   { env:`${prjEnvPrefix}_PORT`, def:80 },
@@ -50,9 +57,9 @@ appl.params = require('./utils/params')(prjName, {
 });
 
 // heakthcheck endpoint
-appl.route('/healthcheck')
+app.route('/healthcheck')
   .get( (req, res) => {
-    return res.json(reply.success(appl.params.getAllVariables()));
+    return res.json(reply.success(app.params.getAllVariables()));
   })
   .post(
     helpers.validateReqBody(jsv, 'healthCheckSchema'),
@@ -62,10 +69,10 @@ appl.route('/healthcheck')
   );
   
 // start http server
-var server = appl.listen(appl.params.get('port'), appl.params.get('lstn'), () => {
+var server = app.listen(app.params.get('port'), app.params.get('lstn'), () => {
   const host = server.address().address;
   const port = server.address().port;
   console.log(`Server is listening http://${host}:${port}`);
 });
-module.exports = { server:server, params:appl.params };
+module.exports = { server:server, params:app.params };
 

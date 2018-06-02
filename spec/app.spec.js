@@ -4,7 +4,7 @@ const reply = require('../src/utils/reply')();
 describe("Appl", () => {
   var context;
   beforeAll(() => {
-    context = require("../src/appl");
+    context = require("../src/app");
   });
   afterAll(() => {
     context.server.close();

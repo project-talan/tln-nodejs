@@ -8,9 +8,9 @@
     "type": "git",
     "url": "git+https://github.com/project-talan/tln-nodejs.git"
   },
-  "main": "src/appl.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node src/appl.js",
+    "start": "node src/app.js",
     "serve": "NODE_ENV=development nodemon --watch src --watch spec",
     "jasmine-init": "./node_modules/jasmine/bin/jasmine.js init",
     "jasmine": "./node_modules/jasmine/bin/jasmine.js",
