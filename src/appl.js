@@ -12,6 +12,11 @@ const bodyParser = require('body-parser');
 
 // project specific modules
 //
+const jsv = require('./utils/jsv')({ allErrors:true, removeAdditional:'all' });
+// API response composer
+const reply = require('./utils/reply')();
+// helpers
+const helpers = require('./utils/helpers')(jsv, reply);
 
 // appl
 // global application middleware
@@ -32,13 +37,8 @@ const healthCheckSchema = {
   },
   "required": ["timeout"]
 };
-const jsv = require('./utils/jsv')({ allErrors:true, removeAdditional:'all' });
 jsv.compile('healthCheckSchema', healthCheckSchema);
 
-// API response composer
-const reply = require('./utils/reply')();
-// helpers
-const helpers = require('./utils/helpers')(jsv, reply);
 
 // service parameters
 appl.params = require('./utils/params')(prjName, { 
