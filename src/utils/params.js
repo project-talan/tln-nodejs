@@ -1,10 +1,10 @@
-module.exports = function(name, variables) {
+module.exports = function(variables) {
   //
-  this.name = name;
-  this.variables = {};
-  Object.keys(variables).map(function(key, index) {
-    this.variables[key] = (process.env[variables[key].env] == undefined)?(variables[key].def):(process.env[variables[key].env]);
-  });
+  this.load = function(variables) {
+    Object.keys(variables).map(function(key, index) {
+      this.variables[key] = (process.env[variables[key].env] == undefined)?(variables[key].def):(process.env[variables[key].env]);
+    });
+  }
   //
   this.get = function get(paramName) {
     return this.variables[paramName];
@@ -19,13 +19,16 @@ module.exports = function(name, variables) {
   }
   //
   this.printParams = function() {
-    console.log(`${name} service`);
+    console.log(this.get('name') + ' service');
     console.log(this.variables);
   }
   //
   this.getAllVariables = function() {
     return this.variables;
   }
+  //
+  this.variables = {};
+  this.load(variables);
   //
   return this;
 };
