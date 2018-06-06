@@ -2,7 +2,12 @@ module.exports = function(variables) {
   //
   this.load = function(variables) {
     Object.keys(variables).map(function(key, index) {
-      this.variables[key] = (process.env[variables[key].env] == undefined)?(variables[key].def):(process.env[variables[key].env]);
+      const v = process.env[variables[key].env];
+      if (v != 'undefined' && v){
+        this.variables[key] = v;
+      } else {
+        this.variables[key] = variables[key].def;
+      }
     });
   }
   //

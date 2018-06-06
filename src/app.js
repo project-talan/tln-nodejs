@@ -2,7 +2,13 @@
 
 // common modules
 const express = require('express');
-require('dotenv').config();
+const helmet = require('helmet');
+const session = require('express-session'); 
+const sessionFileStore = require('session-file-store')(session);
+const csrf = require('csurf');
+const cors = require('cors');
+const randomstring = require("randomstring");
+const dotenv = require('dotenv').config();
 const bodyParser = require('body-parser');
 
 // project specific modules
@@ -14,6 +20,18 @@ const helpers = require('./utils/helpers')(jsv, reply);
 // app
 // global application middleware
 const app = express();
+// service parameters
+app.params = require('./utils/params')({ 
+  name:   { env:'PROJECT_NAME', def:'tln-nodejs' },
+  key:    { env:'PROJECT_KEY', def:'org.talan.nodejs' },
+  version:{ env:`PROJECT_VERSION`, def:'0.1.0' },
+  host:   { env:'PROJECT_PARAM_HOST', def:'localhost' },
+  lstn:   { env:'PROJECT_PARAM_LSTN', def:'0.0.0.0' },
+  port:   { env:'PROJECT_PARAM_PORT', def:8080 },
+  ports:  { env:'PROJECT_PARAM_PORTS', def:8443 },
+  secret: { env:'PROJECT_PARAM_SECRET', def:randomstring.generate({length: 32,charset: 'alphabetic'})}
+});
+
 app.use(bodyParser.json());
 app.use(function (err, req, res, next) {
   if (err instanceof SyntaxError) {
@@ -22,7 +40,24 @@ app.use(function (err, req, res, next) {
     next(err);
   }
 });
-
+app.use(helmet());
+app.use(session({
+    store: new sessionFileStore({}),
+    secret: app.params.get('secret'),
+    name : app.params.get('key'),
+    resave: false,
+    saveUninitialized: true
+}));
+/*app.use(csrf());
+app.use(function(req, res, next) {
+  res.locals._csrf = req.csrfToken();
+  next();
+});*/
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
 
 // utilities
 // json validator
@@ -40,16 +75,6 @@ const healthCheckSchema = {
 };
 jsv.compile('healthCheckSchema', healthCheckSchema);
 
-// service parameters
-app.params = require('./utils/params')({ 
-  name:   { env:'PROJECT_NAME', def:'tln-nodejs' },
-  key:    { env:'PROJECT_KEY', def:'org.talan.nodejs' },
-  version:{ env:`PROJECT_VERSION`, def:'0.1.0' },
-  host:   { env:'PROJECT_PARAM_HOST', def:'localhost' },
-  lstn:   { env:'PROJECT_PARAM_LSTN', def:'0.0.0.0' },
-  port:   { env:'PROJECT_PARAM_PORT', def:8080 },
-  ports:  { env:'PROJECT_PARAM_PORTS', def:8443 }
-});
 
 // heakthcheck endpoint
 app.route('/healthcheck')
