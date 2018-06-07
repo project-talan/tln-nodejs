@@ -11,6 +11,8 @@ module.exports = function(){
   const randomstring = require("randomstring");
   const dotenv = require('dotenv').config();
   const bodyParser = require('body-parser');
+  const sss = require('simple-stats-server');
+  const stats = sss();
 
   // project specific modules
   // unilities: json parser, reply builder, helpers
@@ -75,8 +77,8 @@ module.exports = function(){
     "required": ["timeout"]
   };
   jsv.compile('healthCheckSchema', healthCheckSchema);
-
-  // heakthcheck endpoint
+  //---------------------------------------------------------------------------
+  // healthcheck endpoint
   app.route('/healthcheck')
     .get( (req, res) => {
       return res.json(reply.success(app.params.getAllVariables()));
@@ -87,10 +89,14 @@ module.exports = function(){
         return res.json(reply.success({key:"value"}));
       }
     );
+  // status
+  app.use('/stats', stats);
+
   // API v1
   const apiV1 = require('./api/v1/impl')(express, jsv, reply, helpers);
   app.use(apiV1.getRouterPath(), apiV1.getRouter());
 
+  //---------------------------------------------------------------------------
   // start http server
   var server = app.listen(app.params.get('port'), app.params.get('lstn'), () => {
     const host = server.address().address;

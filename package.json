@@ -27,7 +27,8 @@
     "helmet": "3.12.1",
     "randomstring": "1.1.5",
     "request": "2.85.0",
-    "session-file-store": "1.2.0"
+    "session-file-store": "1.2.0",
+    "simple-stats-server": "0.0.5"
   },
   "devDependencies": {
     "jasmine": "3.1.0",
