@@ -10,8 +10,11 @@ module.exports = function(express, jsv, reply, helpers) {
     .get(function (req, res) {
       return res.json(reply.success({id:'v1'}));
     });
-  //
   //----------------------------------------------------------------------------
+  // projects specific functionality
+  
+  //----------------------------------------------------------------------------
+  //
   this.getRouterPath = function() {
     return this.routerPath;
   }
