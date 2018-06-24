@@ -25,14 +25,14 @@ module.exports = function(){
   const app = express();
   // service parameters
   app.params = require('./utils/params')({ 
-    name:   { env:'PROJECT_NAME', def:'tln-nodejs' },
-    key:    { env:'PROJECT_KEY', def:'org.talan.nodejs' },
-    version:{ env:`PROJECT_VERSION`, def:'0.1.0' },
-    host:   { env:'PROJECT_PARAM_HOST', def:'localhost' },
-    lstn:   { env:'PROJECT_PARAM_LSTN', def:'0.0.0.0' },
-    port:   { env:'PROJECT_PARAM_PORT', def:8080 },
-    ports:  { env:'PROJECT_PARAM_PORTS', def:8443 },
-    secret: { env:'PROJECT_PARAM_SECRET', def:randomstring.generate({length: 32,charset: 'alphabetic'})}
+    name:   { env:'COMPONENT_NAME', def:'tln-nodejs' },
+    key:    { env:'COMPONENT_KEY', def:'org.talan.nodejs' },
+    version:{ env:`COMPONENT_VERSION`, def:'0.1.0' },
+    host:   { env:'COMPONENT_PARAM_HOST', def:'localhost' },
+    lstn:   { env:'COMPONENT_PARAM_LSTN', def:'0.0.0.0' },
+    port:   { env:'COMPONENT_PARAM_PORT', def:8080 },
+    ports:  { env:'COMPONENT_PARAM_PORTS', def:8443 },
+    secret: { env:'COMPONENT_PARAM_SECRET', def:randomstring.generate({length: 32,charset: 'alphabetic'})}
   });
 
   app.use(bodyParser.json());
