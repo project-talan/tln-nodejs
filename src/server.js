@@ -92,8 +92,7 @@ module.exports = function(){
   app.use('/stats', stats);
 
   // API v1
-  const apiV1 = require('./api/v1/impl')(express, jsv, reply, helpers);
-  app.use(apiV1.getRouterPath(), apiV1.getRouter());
+  const apiV1 = require('./api/v1/impl')(express, app, jsv, reply, helpers);
 
   //---------------------------------------------------------------------------
   // start http server
