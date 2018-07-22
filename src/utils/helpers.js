@@ -1,3 +1,6 @@
+/*
+ * Validate request json body using schema defeinition
+ */
 module.exports = function(jsv, reply) {
   //
   this.validateReqBody = function(jsv, schemaId) {

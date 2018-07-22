@@ -1,3 +1,6 @@
+/*
+ * Helper class contructs API response
+ */
 module.exports = function() {
   //
   this.success = function(data, links = null) {
