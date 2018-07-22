@@ -25,8 +25,7 @@ module.exports = function(){
   const app = express();
   // service parameters
   app.params = require('./utils/params')({ 
-    name:   { env:'COMPONENT_NAME', def:'tln-nodejs' },
-    key:    { env:'COMPONENT_KEY', def:'org.talan.nodejs' },
+    key:    { env:'COMPONENT_ID', def:'org.talan.nodejs' },
     version:{ env:`COMPONENT_VERSION`, def:'0.1.0' },
     host:   { env:'COMPONENT_PARAM_HOST', def:'localhost' },
     lstn:   { env:'COMPONENT_PARAM_LSTN', def:'0.0.0.0' },

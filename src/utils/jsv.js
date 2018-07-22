@@ -1,3 +1,6 @@
+/*
+ * Cache for compiled schemas + validate
+ */
 module.exports = function(options) {
   //
   const Ajv = require('ajv');

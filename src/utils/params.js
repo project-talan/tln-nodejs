@@ -1,3 +1,6 @@
+/*
+ * Holds service parameters were read from environment variables
+ */
 module.exports = function(variables) {
   //
   this.load = function(variables) {
