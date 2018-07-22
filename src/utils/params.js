@@ -21,8 +21,8 @@ module.exports = function(variables) {
   this.buildEndpoint = function(hostParam, portParam, path, query = null, hash = null) {
     // TODO implement processing for query and hash
     const r = path.slice();
-    const h = this.get(hostParamName);
-    const p = this.get(portParamName);
+    const h = this.get(hostParam);
+    const p = this.get(portParam);
     r.unshift(`http://${h}:${p}`);
     return r.join('/');
   }
