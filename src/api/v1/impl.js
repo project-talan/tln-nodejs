@@ -2,9 +2,9 @@
 module.exports = function(express, app, jsv, reply, helpers) {
 
   this.routerPath = '/api/v1';
-  this.router = express.Router();
+  this.router = express.Router({mergeParams: true});
   //----------------------------------------------------------------------------
-  // projects specific declarations
+  // component specific declarations
   
   //----------------------------------------------------------------------------
   // api enpoint info
@@ -12,11 +12,9 @@ module.exports = function(express, app, jsv, reply, helpers) {
     // version info
     .get(function (req, res) {
       return res.json(reply.success({id:'v1'}));
-    })
-    // projects specific routers
-    ;
+    });
   //----------------------------------------------------------------------------
-  // project specific functionality
+  // component specific routers
 
   //----------------------------------------------------------------------------
   // register router
