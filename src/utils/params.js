@@ -18,12 +18,13 @@ module.exports = function(variables) {
     return this.variables[paramName];
   }
   //
-  this.buildEndpoint = function(hostParamName, portParamName, ...args) {
-    var args = Array.from(args);
+  this.buildEndpoint = function(hostParam, portParam, path, query = null, hash = null) {
+    // TODO implement processing for query and hash
+    const r = path.slice();
     const h = this.get(hostParamName);
     const p = this.get(portParamName);
-    args.unshift(`http://${h}:${p}`);
-    return args.join('/');
+    r.unshift(`http://${h}:${p}`);
+    return r.join('/');
   }
   //
   this.printParams = function() {
