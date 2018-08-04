@@ -9,6 +9,4 @@ module.exports = function() {
   this.fail = function(errors) {
     return {success:false, errors:errors};
   }
-  //
-  return this;
 };

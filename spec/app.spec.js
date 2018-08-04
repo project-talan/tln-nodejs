@@ -1,5 +1,4 @@
 var req = require("request");
-const reply = require('../src/utils/reply')();
 
 describe("Appl", () => {
   var context;
@@ -12,8 +11,8 @@ describe("Appl", () => {
   describe("GET /healthcheck", () => {
     var data = {};
     beforeAll((done) => {
-      const h = context.params.get('host');
-      const p = context.params.get('port');
+      const h = context.params.host;
+      const p = context.params.port;
       req.get(`http://${h}:${p}/healthcheck`, (error, response, body) => {
         data.status = response.statusCode;
         data.body = JSON.parse(body);

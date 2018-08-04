@@ -11,6 +11,4 @@ module.exports = function(jsv, reply) {
       next();
     };
   }
-  //
-  return this;
 };

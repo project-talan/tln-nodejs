@@ -1,4 +1,4 @@
-const jsv = require('./../../src/utils/jsv')({ allErrors:true, removeAdditional:'all' });
+const jsv = new (require('./../../src/utils/jsv'))({ allErrors:true, removeAdditional:'all' });
 
 describe("JSON validator", () => {
   const schema1 = {
