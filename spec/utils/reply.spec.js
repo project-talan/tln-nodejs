@@ -1,4 +1,4 @@
-const reply = require('./../../src/utils/reply')();
+const reply = new (require('./../../src/utils/reply'))();
 
 describe("Reply", () => {
   const e = ['error1', 'error2'];

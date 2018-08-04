@@ -1,43 +1,34 @@
 /*
  * Holds service parameters were read from environment variables
  */
-module.exports = function(variables) {
-  //
+module.exports = function() {
+  // load parameters from environment variables or use default values
   this.load = function(variables) {
-    Object.keys(variables).map(function(key, index) {
-      const v = process.env[variables[key].env];
+    let f = function(k, i) {
+      const v = process.env[variables[k].env];
       if (v != 'undefined' && v){
-        this.variables[key] = v;
+        this[k] = v;
       } else {
-        this.variables[key] = variables[key].def;
+        this[k] = variables[k].def;
       }
-    });
+    };
+    Object.keys(variables).map(f.bind(this));
   }
   //
-  this.get = function get(paramName) {
-    return this.variables[paramName];
-  }
-  //
-  this.buildEndpoint = function(hostParam, portParam, path, query = null, hash = null) {
+  this.buildEndpoint = function(path, query = null, hash = null) {
     // TODO implement processing for query and hash
     const r = path.slice();
-    const h = this.get(hostParam);
-    const p = this.get(portParam);
-    r.unshift(`http://${h}:${p}`);
+    r.unshift(`http://${this.host}:${this.port}`);
     return r.join('/');
   }
   //
-  this.printParams = function() {
-    console.log(this.get('name') + ' service');
-    console.log(this.variables);
+  this.log = function() {
+    console.log(`Component [${this.key}]`);
+    console.log('Environment:');
+    for(var n in this) {
+      if (typeof this[n] !== "function") {
+        console.log(`* ${n}: ${this[n]}`);
+      }
+    }
   }
-  //
-  this.getAllVariables = function() {
-    return this.variables;
-  }
-  //
-  this.variables = {};
-  this.load(variables);
-  //
-  return this;
 };
