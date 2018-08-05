@@ -5,7 +5,7 @@ module.exports = function(){
   const express = require('express');
   const helmet = require('helmet');
   const session = require('express-session'); 
-  //const store = require('session-file-store')(session);
+  const store = require('session-file-store')(session);
   //const csrf = require('csurf');
   const cors = require('cors');
   const randomstring = require("randomstring");
@@ -53,11 +53,25 @@ module.exports = function(){
   // Session management ========================================================
   // 
   app.use(session({
-    //store: new sessionFileStore({}),
-    secret: app.params.secret,
+    cookie:{
+      // domain: null,
+      // expires: null,
+      httpOnly: true,
+      // maxAge: null,
+      maxAge: null,
+      path: '/',
+      // sameSite: null,
+      secure: false
+    },
+    // genid: null,
     name : app.params.key,
-    resave: false,
-    saveUninitialized: true
+    // proxy: null,
+    resave: true,
+    // rolling: false,
+    saveUninitialized: true,
+    secret: app.params.secret,
+     store: new store({}),
+    // unset: 'keep'
   }));
   //
   // CSRF =====================================================================
@@ -69,8 +83,24 @@ module.exports = function(){
   });
   /*/
   app.use(cors({
-    origin: '*',
+    origin: function (origin, callback) {
+      // allow requests with no origin 
+      // (like mobile apps or curl requests)
+      if(!origin) return callback(null, true);
+      //
+      const wl = app.params.whitelist.split(',');
+      if (wl.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+      let msg = 'The CORS policy for this site does not ' + 'allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    // allowedHeaders: 'Content-Type,Content-Length,Authorization,X-Requested-With,*',
+    // exposedHeaders: '',
     credentials: true,
+    // maxAge: null,
+    preflightContinue: false,
     optionsSuccessStatus: 200
   }));
   //
@@ -93,6 +123,7 @@ module.exports = function(){
   // healthcheck endpoint
   app.route('/healthcheck')
     .get( (req, res) => {
+      console.log(req.session);
       return res.json(reply.success(app.params));
     })
     .post(
