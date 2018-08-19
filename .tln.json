@@ -12,6 +12,12 @@
         "npm i"
       ]
     },
+    "test":{
+      "shell":[
+        ". ./.env.sh",
+        "npm run jasmine"
+      ]
+    },
     "serve":{
       "shell":[
         ". ./.env.sh",
