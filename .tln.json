@@ -3,7 +3,8 @@
     "prereq":{
       "shell":[
         "envsubst < .env.template > .env",
-        "envsubst < sonar-project.properties.template > sonar-project.properties"
+        "envsubst < sonar-project.properties.template > sonar-project.properties",
+        "npm i"
       ]
     },
     "build":{
@@ -27,7 +28,9 @@
     "docker.build":{
       "shell":[
         ". ./.env.sh",
-        "docker build -t ${COMPONENT_ID}:${COMPONENT_VERSION} ."
+        "docker build \\",
+        "--build-arg COMPONENT_PARAM_PORT=$COMPONENT_PARAM_PORT \\",
+        " -t ${COMPONENT_ID}:${COMPONENT_VERSION} ."
       ]
     },
     "docker.run":{
