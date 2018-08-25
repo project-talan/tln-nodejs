@@ -14,14 +14,16 @@ module.exports = function(){
   const sss = require('simple-stats-server');
   const stats = sss();
 
-  // Skeleton specific modules =================================================
   // unilities: json parser, reply builder, helpers
   const jsv = new (require('./utils/jsv'))({ allErrors:true, removeAdditional:'all' });
   const reply = new (require('./utils/reply'))();
   const helpers = new (require('./utils/helpers'))(jsv, reply);
+  // constants
+  const secretString = randomstring.generate({length: 32, charset: 'alphabetic'});
+
+  // [Components] specific modules & constants =================================
 
   // Express application =======================================================
-  // global application middleware
   const app = express();
   // service parameters
   app.params = new (require('./utils/params'))();
@@ -32,9 +34,8 @@ module.exports = function(){
     lstn:       { env:'COMPONENT_PARAM_LSTN',           def: '0.0.0.0' },
     port:       { env:'COMPONENT_PARAM_PORT',           def: 9081 },
     ports:      { env:'COMPONENT_PARAM_PORTS',          def: 9444 },
-    secret:     { env:'COMPONENT_PARAM_SECRET',         def: randomstring.generate({length: 32,charset: 'alphabetic'})},
     whitelist:  { env:'COMPONENT_PARAM_CORS_WHITELIST', def: '*' },
-    // component specific parameters
+    // [Component] specific parameters =========================================
   });
   //
   app.use(bodyParser.json());
@@ -69,7 +70,7 @@ module.exports = function(){
     resave: true,
     // rolling: false,
     saveUninitialized: true,
-    secret: app.params.secret,
+    secret: secretString,
      store: new store({}),
     // unset: 'keep'
   }));
@@ -119,8 +120,8 @@ module.exports = function(){
     "required": ["timeout"]
   };
   jsv.compile('healthCheckSchema', healthCheckSchema);
-  //---------------------------------------------------------------------------
-  // healthcheck endpoint
+
+  // Healthcheck endpoint ======================================================
   app.route('/healthcheck')
     .get( (req, res) => {
       console.log(req.session);
@@ -132,14 +133,13 @@ module.exports = function(){
         return res.json(reply.success({key:"value"}));
       }
     );
-  // status
+  // Status endpoint ===========================================================
   app.use('/stats', stats);
 
-  // API v1
+  // API v1 ====================================================================
   const apiV1 = require('./api/v1/impl')(express, app, jsv, reply, helpers);
 
-  //---------------------------------------------------------------------------
-  // start http server
+  // start http server =========================================================
   var server = app.listen(app.params.port, app.params.lstn, () => {
     const host = server.address().address;
     const port = server.address().port;
