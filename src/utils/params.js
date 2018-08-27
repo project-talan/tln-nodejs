@@ -22,9 +22,7 @@ module.exports = function() {
   this.buildEndpoint = function(host, port, path, query = null, hash = null) {
     // TODO implement processing for query and hash
     const r = path.slice();
-    const h = this[host];
-    const p = this[port];
-    r.unshift(`http://${h}:${p}`);
+    r.unshift(`http://${host}:${port}`);
     return r.join('/');
   }
   //
