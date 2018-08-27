@@ -19,10 +19,10 @@ module.exports = function() {
     this[name] = value;
   }
   //
-  this.buildEndpoint = function(path, query = null, hash = null) {
+  this.buildEndpoint = function(host, port, path, query = null, hash = null) {
     // TODO implement processing for query and hash
     const r = path.slice();
-    r.unshift(`http://${this.host}:${this.port}`);
+    r.unshift(`http://${host}:${port}`);
     return r.join('/');
   }
   //
