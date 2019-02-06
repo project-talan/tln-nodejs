@@ -1,12 +1,23 @@
+'use strict';
 /*
- * Helper class contructs API response
+ * Helper class aims to contruct API response
  */
-module.exports = function() {
-  //
-  this.success = function(data, links = null) {
-    return {success:true, data:data, links:links};
+
+class Reply {
+
+  constructor() {
   }
-  this.fail = function(errors) {
-    return {success:false, errors:errors};
+
+  success(data, refs = null) {
+    return { success:true, data:data, refs:refs };
   }
-};
+
+  fail(errors) {
+    return { success:false, errors:errors };
+  }
+
+}
+
+module.exports.create = () => {
+  return new Reply();
+}

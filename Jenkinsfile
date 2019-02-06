@@ -68,8 +68,8 @@ node {
   stage('test') {
     sh './test.sh';
   }
-  stage('package') {
+  stage('delivery') {
   }
-  stage('upload') {
+  stage('deploy') {
   }
 }
