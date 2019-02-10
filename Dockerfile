@@ -1,4 +1,4 @@
-FROM node:9.10.1-alpine
+FROM node:11.9.0-alpine
 
 #
 HEALTHCHECK --interval=5s --timeout=3s CMD curl --fail http://localhost:$(printenv COMPONENT_PARAM_PORT)/healthcheck || exit 1
