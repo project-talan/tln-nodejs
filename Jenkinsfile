@@ -97,17 +97,17 @@ node {
     printTopic('Author(s)')
     echo "[lastCommitAuthorEmail:${lastCommitAuthorEmail}]"
   }
-  stage('init') {
+  stage('Init') {
     sh './init.sh';
   }
-  stage('build') {
+  stage('Build') {
     sh './build.sh';
   }
-  stage('test') {
+  stage('Unit test') {
     sh './test.sh';
   }
-  stage('delivery') {
+  stage('Delivery') {
   }
-  stage('deploy') {
+  stage('Deploy') {
   }
 }
