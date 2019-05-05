@@ -23,8 +23,8 @@ class Server {
   }
 
   /*
-  *
-  *
+  * Helper function which returns middleware to validate json according to schema
+  * @schemaId - previously compiled schema id
   */
   validateReqBody(schemaId) {
     return (req, res, next) => {
@@ -51,7 +51,8 @@ class Server {
       certs:      { env:'COMPONENT_PARAM_SSL_CERTS',      def: null,                delim: ',' },
       whitelist:  { env:'COMPONENT_PARAM_CORS_WHITELIST', def: '*',                 delim: ',' }
     }, env);
-    // add json body parser
+    //--------------------------------------------------------------------------
+    // json body parser
     const bodyParser = require('body-parser');
     this.app.use(bodyParser.json());
     this.app.use((err, req, res, next) => {
@@ -61,9 +62,69 @@ class Server {
         next(err);
       }
     });
+    //--------------------------------------------------------------------------
+    //
+    const helmet = require('helmet');
+    this.app.use(helmet());
+    //--------------------------------------------------------------------------
+    //
+    const session = require('express-session'); 
+    const store = require('session-file-store')(session);
+    const randomstring = require("randomstring");
+    this.app.use(session({
+      cookie:{
+        // domain: null,
+        // expires: null,
+        httpOnly: true,
+        // maxAge: null,
+        maxAge: null,
+        path: '/',
+        // sameSite: null,
+        secure: false // NOTE https enable sites, recommended
+      },
+      // genid: null,
+      name : this.params.key,
+      // proxy: null,
+      resave: true,
+      // rolling: false,
+      saveUninitialized: true,
+      secret: randomstring.generate({length: 32, charset: 'alphabetic'}),
+      store: new store({}),
+      // unset: 'keep'
+    }));
+
+    //--------------------------------------------------------------------------
+    //
+    const cors = require('cors');
+    this.app.use(cors({
+      origin: (origin, callback) => {
+        // allow requests with no origin 
+        // (like mobile apps or curl requests)
+        if(!origin) return callback(null, true);
+        //
+        if ((this.params.whitelist.indexOf(origin) !== -1) || (this.params.whitelist == '*')) {
+          return callback(null, true);
+        }
+        let msg = 'The CORS policy for this site does not ' + 'allow access from the specified Origin.';
+        return callback(new Error(msg), false);
+      },
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      // allowedHeaders: 'Content-Type,Content-Length,Authorization,X-Requested-With,*',
+      // exposedHeaders: '',
+      credentials: true,
+      // maxAge: null,
+      preflightContinue: false,
+      optionsSuccessStatus: 200
+    }));
+
+    //--------------------------------------------------------------------------
+    // TODO: add rate limits
+
+    //--------------------------------------------------------------------------
     // Status endpoint
     this.app.use('/stats', this.stats);
 
+    //--------------------------------------------------------------------------
     // Healthcheck endpoint
     // json validator for healthcheck POST request
     this.jsv.compile('hcSchema',
@@ -90,6 +151,9 @@ class Server {
           return res.json(this.reply.success({key:"value"}));
         }
       );
+
+    //--------------------------------------------------------------------------
+    // TODO: load available APIs
 
     return true;
   }
@@ -138,7 +202,7 @@ module.exports.run = (logger, env) => {
 }
 
 module.exports.run4tests = () => {
-  return module.exports.run(require('./utils/logger').create(3), {host: 'localhost', lstn:'localhost', port:8080, ports:8443});
+  return module.exports.run(require('./utils/logger').create(3), {host: 'localhost', lstn:'localhost', port:6080, ports:6443});
 }
 
 /*
@@ -165,11 +229,7 @@ module.exports = function(){
 
 
   // Common modules ============================================================
-  const helmet = require('helmet');
-  const session = require('express-session'); 
-  const store = require('session-file-store')(session);
   //const csrf = require('csurf');
-  const cors = require('cors');
   const randomstring = require("randomstring");
 
   // [Components] specific modules & constants =================================
@@ -178,33 +238,9 @@ module.exports = function(){
   // service parameters
   //
   //
-  // Helmet ====================================================================
-  //
-  app.use(helmet());
   //
   // Session management ========================================================
   // 
-  app.use(session({
-    cookie:{
-      // domain: null,
-      // expires: null,
-      httpOnly: true,
-      // maxAge: null,
-      maxAge: null,
-      path: '/',
-      // sameSite: null,
-      secure: false
-    },
-    // genid: null,
-    name : app.params.key,
-    // proxy: null,
-    resave: true,
-    // rolling: false,
-    saveUninitialized: true,
-    secret: secretString,
-     store: new store({}),
-    // unset: 'keep'
-  }));
   //
   // CSRF =====================================================================
   //
@@ -214,27 +250,6 @@ module.exports = function(){
   //   next();
   // });
   //
-  app.use(cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin 
-      // (like mobile apps or curl requests)
-      if(!origin) return callback(null, true);
-      //
-      const wl = app.params.whitelist.split(',');
-      if (wl.indexOf(origin) !== -1) {
-        return callback(null, true);
-      }
-      let msg = 'The CORS policy for this site does not ' + 'allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    },
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    // allowedHeaders: 'Content-Type,Content-Length,Authorization,X-Requested-With,*',
-    // exposedHeaders: '',
-    credentials: true,
-    // maxAge: null,
-    preflightContinue: false,
-    optionsSuccessStatus: 200
-  }));
   //
   // utilities
 
