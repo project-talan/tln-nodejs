@@ -1,7 +1,7 @@
 {
-  "name": "talan-tln-nodejs",
+  "name": "org.talan.nodejs",
   "version": "19.5.0",
-  "description": "talan-tln-nodejs",
+  "description": "Project Talan - NodeJS skeleton",
   "license": "MIT",
   "author": "Vladyslav Kurmaz <vladislav.kurmaz@gmail.com>",
   "repository": {
