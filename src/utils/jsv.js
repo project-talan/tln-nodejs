@@ -1,31 +1,42 @@
+'use strict';
 /*
  * Cache for compiled schemas + validate
  */
-module.exports = function(options) {
+class Jsv {
+
+  constructor(logger, options) {
+    this.logger = logger;
+    const Ajv = require('ajv');
+    this.ajv = new Ajv(options);
+    this.cache = {};
+  }
+
   //
-  const Ajv = require('ajv');
-  this.ajv = new Ajv(options);
-  this.cache = {};
-  //
-  this.compile = function(id, schema) {
+  compile(id, schema) {
     if (!this.isCompiled(id)) {
       try {
         this.cache[id] = this.ajv.compile(schema);
       } catch (e) {
-        console.log(e);
+        this.logger.log(e);
         return false;
       }
     }
     return (this.isCompiled(id));
   }
-  this.validate = function(id, data) {
+
+  validate(id, data) {
     return this.cache[id](data);
   }
-  this.errors = function(id) {
+
+  errors(id) {
     return this.cache[id].errors;
   }
-  //
-  this.isCompiled = function(id) {
+
+  isCompiled(id) {
     return (this.cache[id] != null);
   }
 };
+
+module.exports.create = (logger, options) => {
+  return new Jsv(logger, options);
+}

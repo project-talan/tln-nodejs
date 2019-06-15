@@ -10,7 +10,7 @@ describe('Params', () => {
 
   beforeAll(() => {
     process.env[var2Name] = var2TestValue;
-    params = new (require('./../../src/utils/params'))();
+    params = require('./../../src/utils/params').create();
     params.load({ 
       var1:   { env:var1Name, def:var1DefValue },
       var2:   { env:var2Name, def:var2DefValue }

@@ -1,10 +1,8 @@
-# Talan Project - Nodejs template
+# Project Talan Project - Nodejs skeleton
 
 ## Create projects from scratch
-* Create package.json
-* Create src/app.js file
-* 
-* npm i express express-session session-file-store cors request --save
-* npm i jasmine jasmine-core karma karma-chrome-launcher karma-coverage karma-jasmine karma-requirejs nodemon puppeteer requirejs --save-dev
-* npm run jasmine-init
-* npm run karma-init
+
+
+## Install missing dependencies
+* https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md
+* node_modules/puppeteer/.local-chromium/linux-656675/chrome-linux# ldd chrome | grep not

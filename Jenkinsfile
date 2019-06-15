@@ -1,13 +1,46 @@
-def sendEmailNotification(subj, recepients) {
-    emailext body: "${BUILD_URL}",
-    recipientProviders: [
-      [$class: 'CulpritsRecipientProvider'],
-      [$class: 'DevelopersRecipientProvider'],
-      [$class: 'RequesterRecipientProvider']
-    ],
-    subject: subj,
-    to: "${recepients}"
+def configBuildEnv(configFile) {
+  def tools = [
+    'openjdk': ['envs':['JAVA_HOME'], 'paths':['/bin'], 'validate':'java -version'],
+    'nodejs': ['envs':['NODEJS_HOME'], 'paths':['/bin'], 'validate':'node -v'],
+    'maven': ['envs':['MAVEN_HOME', 'M2_HOME'], 'paths':['/bin'], 'validate':'mvn -v']
+  ]
+  def config = [:]
+  if (fileExists(configFile)) {
+    print("Use Configuration from ${configFile}")
+    config = readJSON file: configFile
+  }else{
+    print('Default VM setup will be used')
+  }
+  printTopic('Build environment config')
+  print(config)
+  // configure
+  config.each { prop, val -> 
+    if (tools[prop]) {
+      sh "echo Configurint ${prop} using ${val} version"
+      def t = tool "${val}"
+      tools[prop].envs.each { e ->
+        env[e] = "${t}"
+      }
+      tools[prop].paths.each { p ->
+        env.PATH = "${t}${p}:${env.PATH}"
+      }
+      // validate setup
+      sh "${tools[prop].validate}"
+    }
+  }
 }
+
+def sendEmailNotification(subj, recepients) {
+  emailext body: "${BUILD_URL}",
+  recipientProviders: [
+    [$class: 'CulpritsRecipientProvider'],
+    [$class: 'DevelopersRecipientProvider'],
+    [$class: 'RequesterRecipientProvider']
+  ],
+  subject: subj,
+  to: "${recepients}"
+}
+
 def printTopic(topic) {
   println("[*] ${topic} ".padRight(80, '-'))
 }
@@ -29,6 +62,8 @@ node {
     println(params)
     printTopic('SCM variables')
     println(scmVars)
+    // configure build env
+    configBuildEnv('build.conf.json');
     //
     commitSha = scmVars.GIT_COMMIT
     buildBranch = scmVars.GIT_BRANCH
@@ -41,18 +76,22 @@ node {
     } else {
     }
     //
-    sh 'envsubst < .env.template > .env';
-    sh 'envsubst < sonar-project.properties.template > sonar-project.properties';
+    printTopic('Package info')
+    packageJson = readJSON file: 'package.json'
+    env.COMPONENT_ID = packageJson.name
+    env.COMPONENT_VERSION = packageJson.version
+    echo sh(returnStdout: true, script: 'rm -f .env sonar-project.properties')
     //
     printTopic('Build info')
-    echo "[PR:${pullRequest}] [BRANCH:${scmVars.GIT_BRANCH}] [COMMIT: ${scmVars.GIT_COMMIT}]"
+    echo "[PR:${pullRequest}] [BRANCH:${buildBranch}] [COMMIT: ${commitSha}]"
     printTopic('Environment variables')
     echo sh(returnStdout: true, script: 'env')
     //
-    repo = sh(returnStdout: true, script:'''git config --get remote.origin.url | rev | awk -F'[./:]' '{print $2}' | rev''').trim()
-    org = sh(returnStdout: true, script:'''git config --get remote.origin.url | rev | awk -F'[./:]' '{print $3}' | rev''').trim()
+    org = sh(returnStdout: true, script:'''git config --get remote.origin.url | rev | awk -F'[./:]' '{print $2}' | rev''').trim()
+    repo = sh(returnStdout: true, script:'''git config --get remote.origin.url | rev | awk -F'[./:]' '{print $1}' | rev''').trim()
     //
     printTopic('Repo parameters')
+    echo sh(returnStdout: true, script: 'git config --get remote.origin.url')
     echo "[org:${org}] [repo:${repo}]"
     //
     lastCommitAuthorEmail = sh(returnStdout: true, script:'''git log --format="%ae" HEAD^!''').trim()
@@ -62,14 +101,57 @@ node {
     printTopic('Author(s)')
     echo "[lastCommitAuthorEmail:${lastCommitAuthorEmail}]"
   }
-  stage('build') {
-    sh './build.sh';
+
+  stage('Build') {
+    sh './prereq@sdlc.sh'
+    sh './init@nodejs.sh'
+    sh './build@nodejs.sh'
   }
-  stage('test') {
-    sh './test.sh';
+  //
+  stage('Unit tests') {
+    sh './test@nodejs.sh'
   }
-  stage('package') {
+  //
+  stage('SonarQube analysis') {
+    printTopic('Sonarqube properties')
+    echo sh(returnStdout: true, script: 'cat sonar-project.properties')
+    def scannerHome = tool "${SONARQUBE_SCANNER}"
+    withSonarQubeEnv("${SONARQUBE_SERVER}") {
+      if (pullRequest){
+        sh "${scannerHome}/bin/sonar-scanner -Dsonar.analysis.mode=preview -Dsonar.github.pullRequest=${pullId} -Dsonar.github.repository=${org}/${repo} -Dsonar.github.oauth=${GITHUB_ACCESS_TOKEN} -Dsonar.login=${SONARQUBE_ACCESS_TOKEN}"
+      } else {
+        sh "${scannerHome}/bin/sonar-scanner -Dsonar.login=${SONARQUBE_ACCESS_TOKEN}"
+        // check SonarQube Quality Gates
+        //// Pipeline Utility Steps
+        def props = readProperties  file: '.scannerwork/report-task.txt'
+        echo "properties=${props}"
+        def sonarServerUrl=props['serverUrl']
+        def ceTaskUrl= props['ceTaskUrl']
+        def ceTask
+        //// HTTP Request Plugin
+        timeout(time: 1, unit: 'MINUTES') {
+          waitUntil {
+            def response = httpRequest "${ceTaskUrl}"
+            println('Status: '+response.status)
+            println('Response: '+response.content)
+            ceTask = readJSON text: response.content
+            return (response.status == 200) && ("SUCCESS".equals(ceTask['task']['status']))
+          }
+        }
+        //
+        def qgResponse = httpRequest sonarServerUrl + "/api/qualitygates/project_status?analysisId=" + ceTask['task']['analysisId']
+        def qualitygate = readJSON text: qgResponse.content
+        echo qualitygate.toString()
+        if ("ERROR".equals(qualitygate["projectStatus"]["status"])) {
+          currentBuild.description = "Quality Gate failure"
+          error currentBuild.description
+        }
+      }
+    }
   }
-  stage('upload') {
+
+  stage('Delivery') {
+  }
+  stage('Deploy') {
   }
 }
