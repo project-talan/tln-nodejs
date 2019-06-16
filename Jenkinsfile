@@ -103,7 +103,7 @@ node {
   }
 
   stage('Build') {
-    sh 'node i tln-cli -g'
+    sh 'npm i tln-cli -g'
     sh 'tln prereq'
     sh 'tln init'
     sh 'tln build'
