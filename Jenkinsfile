@@ -103,17 +103,14 @@ node {
   }
 
   stage('Build') {
-    sh 'npm i tln-cli -g'
-    sh 'tln prereq'
-    sh 'tln init'
-    sh 'tln build'
+    sh 'tln prereq:init:build'
   }
   //
   stage('Unit tests') {
     sh 'tln test'
   }
   //
-  stage('SonarQube analysis') {
+  stage('SonarQube') {
     printTopic('Sonarqube properties')
     echo sh(returnStdout: true, script: 'cat sonar-project.properties')
     def scannerHome = tool "${SONARQUBE_SCANNER}"
