@@ -39,11 +39,10 @@ node {
     env.COMPONENT_ID = id
     env.COMPONENT_VERSION = version
   }
-    
+
   try {
 
     stage('Setup build environment') {
-      sh 'npm i -g tln-cli'
       sh 'tln install --depends'
     }
 
