@@ -44,14 +44,14 @@ class Server {
   init(env) {
     this.logger.trace('Initialize server');
     this.params.load({ 
-      key:        { env:'COMPONENT_ID',                   def: 'org.talan.nodejs',  delim: null },
-      version:    { env:'COMPONENT_VERSION',              def: '0.1.0',             delim: null },
-      host:       { env:'COMPONENT_PARAM_HOST',           def: 'localhost',         delim: null },
-      lstn:       { env:'COMPONENT_PARAM_LSTN',           def: '0.0.0.0',           delim: null },
-      port:       { env:'COMPONENT_PARAM_PORT',           def: 9081,                delim: null },
-      ports:      { env:'COMPONENT_PARAM_PORTS',          def: 9444,                delim: null },
-      certs:      { env:'COMPONENT_PARAM_SSL_CERTS',      def: null,                delim: ',' },
-      whitelist:  { env:'COMPONENT_PARAM_CORS_WHITELIST', def: '*',                 delim: ',' }
+      key:        { env:'TLN_COMPONENT_ID',                   def: 'sh.tln.nodejs',  delim: null },
+      version:    { env:'TLN_COMPONENT_VERSION',              def: '0.1.0',          delim: null },
+      host:       { env:'TLN_COMPONENT_PARAM_HOST',           def: 'localhost',      delim: null },
+      lstn:       { env:'TLN_COMPONENT_PARAM_LSTN',           def: '0.0.0.0',        delim: null },
+      port:       { env:'TLN_COMPONENT_PARAM_PORT',           def: 9080,             delim: null },
+      ports:      { env:'TLN_COMPONENT_PARAM_PORTS',          def: 9443,             delim: null },
+      certs:      { env:'TLN_COMPONENT_PARAM_SSL_CERTS',      def: null,             delim: ',' },
+      whitelist:  { env:'TLN_COMPONENT_PARAM_CORS_WHITELIST', def: '*',              delim: ',' }
     }, env);
     //--------------------------------------------------------------------------
     // json body parser
