@@ -51,10 +51,11 @@ node {
 
     stage('Build') {
       sh 'tln prereq:init:build'
+//      sh 'tln prereq:init:build'
     }
 
     stage('Unit tests') {
-      sh 'tln test'
+//      sh 'tln test'
     }
 
     stage('SonarQube analysis') {
