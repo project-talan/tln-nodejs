@@ -17,7 +17,7 @@
     "coverage": "istanbul cover --include-all-sources spec/specs.js && istanbul check-coverage"
   },
   "dependencies": {
-    "ajv": "6.10.0",
+    "ajv": "6.12.3",
     "cors": "2.8.5",
     "csurf": "1.10.0",
     "dotenv": "7.0.0",
